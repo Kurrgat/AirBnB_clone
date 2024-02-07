@@ -1,277 +1,136 @@
-<p align="center">
-  <img src="https://github.com/bdbaraban/AirBnB_clone/blob/master/assets/hbnb_logo.png" alt="HolbertonBnB logo">
-</p>
+# AirBnB Clone Project
 
-<h1 align="center">HolbertonBnB</h1>
-<p align="center">An AirBnB clone.</p>
+## Project Description
 
----
+The AirBnB Clone project aims to create a simplified version of the popular vacation rental platform, allowing users to manage and interact with various objects related to property rentals. This project is a multi-step endeavor, starting with the implementation of a command-line interface (CLI) for managing AirBnB objects.
 
-## Description :house:
+## Getting Started
 
-HolbertonBnB is a complete web application, integrating database storage, 
-a back-end API, and front-end interfacing in a clone of AirBnB.
+To start building the command interpreter for your AirBnB clone project, you can follow these steps. We'll start with the implementation of the `BaseModel` class, serialization/deserialization, and then move on to creating classes for AirBnB objects, and finally, the file storage engine.
 
-The project currently only implements the back-end console.
+### 1. BaseModel class:
+   - Create a file named `base_model.py`.
+   - Define the `BaseModel` class with methods for initialization, serialization, and deserialization.
+   ```python
+   import uuid
+   from datetime import datetime
+   import json
 
-## Classes :cl:
+   class BaseModel:
+       def __init__(self, *args, **kwargs):
+           self.id = str(uuid.uuid4())
+           self.created_at = datetime.now()
+           self.updated_at = datetime.now()
 
-HolbertonBnB utilizes the following classes:
+       def to_dict(self):
+           """Convert object attributes to a dictionary."""
+           obj_dict = self.__dict__.copy()
+           obj_dict['__class__'] = self.__class__.__name__
+           obj_dict['created_at'] = self.created_at.isoformat()
+           obj_dict['updated_at'] = self.updated_at.isoformat()
+           return obj_dict
 
-|     | BaseModel | FileStorage | User | State | City | Amenity | Place | Review |
-| --- | --------- | ----------- | -----| ----- | -----| ------- | ----- | ------ |
-| **PUBLIC INSTANCE ATTRIBUTES** | `id`<br>`created_at`<br>`updated_at` | | Inherits from `BaseModel` | Inherits from `BaseModel` | Inherits from `BaseModel` | Inherits from `BaseModel` | Inherits from `BaseModel` | Inherits from `BaseModel` |
-| **PUBLIC INSTANCE METHODS** | `save`<br>`to_dict` | `all`<br>`new`<br>`save`<br>`reload` | "" | "" | "" | "" | "" | "" |
-| **PUBLIC CLASS ATTRIBUTES** | | | `email`<br>`password`<br>`first_name`<br>`last_name`| `name` | `state_id`<br>`name` | `name` | `city_id`<br>`user_id`<br>`name`<br>`description`<br>`number_rooms`<br>`number_bathrooms`<br>`max_guest`<br>`price_by_night`<br>`latitude`<br>`longitude`<br>`amenity_ids` | `place_id`<br>`user_id`<br>`text` | 
-| **PRIVATE CLASS ATTRIBUTES** | | `file_path`<br>`objects` | | | | | | |
+       def __str__(self):
+           """Return the string representation of the object."""
+           return "[{}] ({}) {}".format(
+               self.__class__.__name__, self.id, self.__dict__)
 
-## Storage :baggage_claim:
+       def save(self):
+           """Update the 'updated_at' attribute and save to a file."""
+           self.updated_at = datetime.now()
+           models.storage.save()
 
-The above classes are handled by the abstracted storage engine defined in the 
-[FileStorage](./models/engine/file_storage.py) class.
+# 2. Serialization and Deserialization:
 
-Every time the backend is initialized, HolbertonBnB instantiates an instance of 
-`FileStorage` called `storage`. The `storage` object is loaded/re-loaded from 
-any class instances stored in the JSON file `file.json`. As class instances are 
-created, updated, or deleted, the `storage` object is used to register 
-corresponding changes in the `file.json`.
+# Create a folder named models.
+# Inside the models folder, create a file named __init__.py.
+# Create a file named file_storage.py in the models folder for the file storage engine.
+# Define methods for serialization and deserialization in file_storage.py.
 
-## Console :computer:
+import json
 
-The console is a command line interpreter that permits management of the backend 
-of HolbertonBnB. It can be used to handle and manipulate all classes utilized by 
-the application (achieved by calls on the `storage` object defined above).
+class FileStorage:
+    __file_path = "file.json"
+    __objects = {}
 
-### Using the Console
+    def all(self):
+        """Return the dictionary of all objects."""
+        return FileStorage.__objects
 
-The HolbertonBnB console can be run both interactively and non-interactively. 
-To run the console in non-interactive mode, pipe any command(s) into an execution 
-of the file `console.py` at the command line.
+    def new(self, obj):
+        """Add a new object to the dictionary."""
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        FileStorage.__objects[key] = obj
 
-```
-$ echo "help" | ./console.py
-(hbnb) 
-Documented commands (type help <topic>):
-========================================
-EOF  all  count  create  destroy  help  quit  show  update
+    def save(self):
+        """Serialize and save the objects to a file."""
+        objects_dict = {key: obj.to_dict() for key, obj in FileStorage.__objects.items()}
+        with open(FileStorage.__file_path, 'w') as file:
+            json.dump(objects_dict, file)
 
-(hbnb) 
-$
-```
+    def reload(self):
+        """Deserialize and load objects from a file."""
+        try:
+            with open(FileStorage.__file_path, 'r') as file:
+                objects_dict = json.load(file)
+                for key, obj_dict in objects_dict.items():
+                    class_name = obj_dict['__class__']
+                    obj = globals()[class_name](**obj_dict)
+                    FileStorage.__objects[key] = obj
+        except FileNotFoundError:
+            pass
 
-Alternatively, to use the HolbertonBnB console in interactive mode, run the 
-file `console.py` by itself:
+# 3. Create AirBnB Classes:
 
-```
-$ ./console.py
-```
+# In the models folder, create files for each AirBnB class (e.g., user.py, state.py, city.py, place.py).
+# In each file, define a class that inherits from BaseModel.
 
-While running in interactive mode, the console displays a prompt for input:
+from models.base_model import BaseModel
 
-```
-$ ./console.py
-(hbnb) 
-```
+class User(BaseModel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Additional attributes for User class
 
-To quit the console, enter the command `quit`, or input an EOF signal 
-(`ctrl-D`).
+# Repeat the above for other classes (State, City, Place, etc.)
 
-```
-$ ./console.py
-(hbnb) quit
-$
-```
+# 4. Command Interpreter:
 
-```
-$ ./console.py
-(hbnb) EOF
-$
-```
+# Create a file named console.py for your command interpreter.
+# Implement a loop to continuously accept user input and process commands.
 
-### Console Commands
+import cmd
 
-The HolbertonBnB console supports the following commands:
+class HBNBCommand(cmd.Cmd):
+    prompt = '(hbnb) '
 
-* **create**
-  * Usage: `create <class>`
+    def do_quit(self, arg):
+        """Exit the command interpreter."""
+        return True
 
-Creates a new instance of a given class. The class' ID is printed and 
-the instance is saved to the file `file.json`.
+    def do_EOF(self, arg):
+        """Exit the command interpreter at EOF."""
+        print()
+        return True
 
-```
-$ ./console.py
-(hbnb) create BaseModel
-119be863-6fe5-437e-a180-b9892e8746b8
-(hbnb) quit
-$ cat file.json ; echo ""
-{"BaseModel.119be863-6fe5-437e-a180-b9892e8746b8": {"updated_at": "2019-02-17T2
-1:30:42.215277", "created_at": "2019-02-17T21:30:42.215277", "__class__": "Base
-Model", "id": "119be863-6fe5-437e-a180-b9892e8746b8"}}
-```
+    def emptyline(self):
+        """Do nothing on an empty line."""
+        pass
 
-* **show**
-  * Usage: `show <class> <id>` or `<class>.show(<id>)`
+if __name__ == '__main__':
+    HBNBCommand().cmdloop()
 
-Prints the string representation of a class instance based on a given id.
+# Extend the HBNBCommand class with methods to handle various commands like create, show, destroy, update, etc.
 
-```
-$ ./console.py
-(hbnb) create User
-1e32232d-5a63-4d92-8092-ac3240b29f46
-(hbnb)
-(hbnb) show User 1e32232d-5a63-4d92-8092-ac3240b29f46
-[User] (1e32232d-5a63-4d92-8092-ac3240b29f46) {'id': '1e32232d-5a63-4d92-8092-a
-c3240b29f46', 'created_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828), 
-'updated_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828)}
-(hbnb) 
-(hbnb) User.show(1e32232d-5a63-4d92-8092-ac3240b29f46)
-[User] (1e32232d-5a63-4d92-8092-ac3240b29f46) {'id': '1e32232d-5a63-4d92-8092-a
-c3240b29f46', 'created_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828), 
-'updated_at': datetime.datetime(2019, 2, 17, 21, 34, 3, 635828)}
-(hbnb) 
-```
-* **destroy**
-  * Usage: `destroy <class> <id>` or `<class>.destroy(<id>)`
+# 5. Unit Tests:
 
-Deletes a class instance based on a given id. The storage file `file.json` 
-is updated accordingly.
+# Create a folder named tests to store your unit tests.
+# Write unit tests for each class and functionality.
 
-```
-$ ./console.py
-(hbnb) create State
-d2d789cd-7427-4920-aaae-88cbcf8bffe2
-(hbnb) create Place
-3e-8329-4f47-9947-dca80c03d3ed
-(hbnb)
-(hbnb) destroy State d2d789cd-7427-4920-aaae-88cbcf8bffe2
-(hbnb) Place.destroy(03486a3e-8329-4f47-9947-dca80c03d3ed)
-(hbnb) quit
-$ cat file.json ; echo ""
-{}
-```
+# Usage
 
-* **all**
-  * Usage: `all` or `all <class>` or `<class>.all()`
+# To use the command interpreter, simply run the main script console.py. This will initiate the CLI, allowing users to input commands and manage objects within the Airbnb clone.
 
-Prints the string representations of all instances of a given class. If no 
-class name is provided, the command prints all instances of every class.
+# License
 
-```
-$ ./console.py
-(hbnb) create BaseModel
-fce2124c-8537-489b-956e-22da455cbee8
-(hbnb) create BaseModel
-450490fd-344e-47cf-8342-126244c2ba99
-(hbnb) create User
-b742dbc3-f4bf-425e-b1d4-165f52c6ff81
-(hbnb) create User
-8f2d75c8-fb82-48e1-8ae5-2544c909a9fe
-(hbnb)
-(hbnb) all BaseModel
-["[BaseModel] (450490fd-344e-47cf-8342-126244c2ba99) {'updated_at': datetime.da
-tetime(2019, 2, 17, 21, 45, 5, 963516), 'created_at': datetime.datetime(2019, 2
-, 17, 21, 45, 5, 963516), 'id': '450490fd-344e-47cf-8342-126244c2ba99'}", "[Bas
-eModel] (fce2124c-8537-489b-956e-22da455cbee8) {'updated_at': datetime.datetime
-(2019, 2, 17, 21, 43, 56, 899348), 'created_at': datetime.datetime(2019, 2, 17,
-21, 43, 56, 899348), 'id': 'fce2124c-8537-489b-956e-22da455cbee8'}"]
-(hbnb)
-(hbnb) User.all()
-["[User] (8f2d75c8-fb82-48e1-8ae5-2544c909a9fe) {'updated_at': datetime.datetim
-e(2019, 2, 17, 21, 44, 44, 428413), 'created_at': datetime.datetime(2019, 2, 17
-, 21, 44, 44, 428413), 'id': '8f2d75c8-fb82-48e1-8ae5-2544c909a9fe'}", "[User] 
-(b742dbc3-f4bf-425e-b1d4-165f52c6ff81) {'updated_at': datetime.datetime(2019, 2
-, 17, 21, 44, 15, 974608), 'created_at': datetime.datetime(2019, 2, 17, 21, 44,
-15, 974608), 'id': 'b742dbc3-f4bf-425e-b1d4-165f52c6ff81'}"]
-(hbnb) 
-(hbnb) all
-["[User] (8f2d75c8-fb82-48e1-8ae5-2544c909a9fe) {'updated_at': datetime.datetim
-e(2019, 2, 17, 21, 44, 44, 428413), 'created_at': datetime.datetime(2019, 2, 17
-, 21, 44, 44, 428413), 'id': '8f2d75c8-fb82-48e1-8ae5-2544c909a9fe'}", "[BaseMo
-del] (450490fd-344e-47cf-8342-126244c2ba99) {'updated_at': datetime.datetime(20
-19, 2, 17, 21, 45, 5, 963516), 'created_at': datetime.datetime(2019, 2, 17, 21,
-45, 5, 963516), 'id': '450490fd-344e-47cf-8342-126244c2ba99'}", "[User] (b742db
-c3-f4bf-425e-b1d4-165f52c6ff81) {'updated_at': datetime.datetime(2019, 2, 17, 2
-1, 44, 15, 974608), 'created_at': datetime.datetime(2019, 2, 17, 21, 44, 15, 97
-4608), 'id': 'b742dbc3-f4bf-425e-b1d4-165f52c6ff81'}", "[BaseModel] (fce2124c-8
-537-489b-956e-22da455cbee8) {'updated_at': datetime.datetime(2019, 2, 17, 21, 4
-3, 56, 899348), 'created_at': datetime.datetime(2019, 2, 17, 21, 43, 56, 899348
-), 'id': 'fce2124c-8537-489b-956e-22da455cbee8'}"]
-(hbnb) 
-```
-
-* **count**
-  * Usage: `count <class>` or `<class>.count()`
-
-Retrieves the number of instances of a given class.
-
-```
-$ ./console.py
-(hbnb) create Place
-12c73223-f3d3-4dec-9629-bd19c8fadd8a
-(hbnb) create Place
-aa229cbb-5b19-4c32-8562-f90a3437d301
-(hbnb) create City
-22a51611-17bd-4d8f-ba1b-3bf07d327208
-(hbnb) 
-(hbnb) count Place
-2
-(hbnb) city.count()
-1
-(hbnb) 
-```
-
-* **update**
-  * Usage: `update <class> <id> <attribute name> "<attribute value>"` or
-`<class>.update(<id>, <attribute name>, <attribute value>)` or `<class>.update(
-<id>, <attribute dictionary>)`.
-
-Updates a class instance based on a given id with a given key/value attribute 
-pair or dictionary of attribute pairs. If `update` is called with a single 
-key/value attribute pair, only "simple" attributes can be updated (ie. not 
-`id`, `created_at`, and `updated_at`). However, any attribute can be updated by 
-providing a dictionary.
-
-```
-$ ./console.py
-(hbnb) create User
-6f348019-0499-420f-8eec-ef0fdc863c02
-(hbnb)
-(hbnb) update User 6f348019-0499-420f-8eec-ef0fdc863c02 first_name "Holberton"
-(hbnb) show User 6f348019-0499-420f-8eec-ef0fdc863c02
-[User] (6f348019-0499-420f-8eec-ef0fdc863c02) {'created_at': datetime.datetime(
-2019, 2, 17, 21, 54, 39, 234382), 'first_name': 'Holberton', 'updated_at': date
-time.datetime(2019, 2, 17, 21, 54, 39, 234382), 'id': '6f348019-0499-420f-8eec-
-ef0fdc863c02'}
-(hbnb)
-(hbnb) User.update(6f348019-0499-420f-8eec-ef0fdc863c02, address, "98 Mission S
-t")
-(hbnb) User.show(6f348019-0499-420f-8eec-ef0fdc863c02)
-[User] (6f348019-0499-420f-8eec-ef0fdc863c02) {'created_at': datetime.datetime(
-2019, 2, 17, 21, 54, 39, 234382), 'address': '98 Mission St', 'first_name': 'Ho
-lberton', 'updated_at': datetime.datetime(2019, 2, 17, 21, 54, 39, 234382), 'id
-': '6f348019-0499-420f-8eec-ef0fdc863c02'}
-(hbnb)
-(hbnb) User.update(6f348019-0499-420f-8eec-ef0fdc863c02, {'email': 'holberton@h
-olberton.com', 'last_name': 'School'})
-[User] (6f348019-0499-420f-8eec-ef0fdc863c02) {'email': 'holberton@holberton.co
-m', 'first_name': 'Holberton', 'updated_at': datetime.datetime(2019, 2, 17, 21,
-54, 39, 234382), 'address': '98 Mission St', 'last_name': 'School', 'id': '6f34
-8019-0499-420f-8eec-ef0fdc863c02', 'created_at': datetime.datetime(2019, 2, 17,
-21, 54, 39, 234382)}
-(hbnb) 
-```
-
-## Testing :straight_ruler:
-
-Unittests for the HolbertonBnB project are defined in the [tests](./tests) 
-folder. To run the entire test suite simultaneously, execute the following command:
-
-```
-$ python3 unittest -m discover tests
-```
-
-Alternatively, you can specify a single test file to run at a time:
-
-```
-$ python3 unittest -m tests/test_console.py
-```
+# This project is licensed under the MIT License - see the LICENSE file for details
