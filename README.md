@@ -40,18 +40,17 @@ To start building the command interpreter for your AirBnB clone project, you can
            self.updated_at = datetime.now()
            models.storage.save()
 
-# 2. Serialization and Deserialization:
+### 2. Serialization and Deserialization:
+   - Create a folder named models.
+   - Inside the models folder, create a file named __init__.py.
+   - Create a file named file_storage.py in the models folder for the file storage engine.
+   - Define methods for serialization and deserialization in file_storage.py.
+   ```python
+   import json
 
-# Create a folder named models.
-# Inside the models folder, create a file named __init__.py.
-# Create a file named file_storage.py in the models folder for the file storage engine.
-# Define methods for serialization and deserialization in file_storage.py.
-
-import json
-
-class FileStorage:
-    __file_path = "file.json"
-    __objects = {}
+   class FileStorage:
+        __file_path = "file.json"
+        __objects = {}
 
     def all(self):
         """Return the dictionary of all objects."""
