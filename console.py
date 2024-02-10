@@ -60,14 +60,15 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         args = arg.split()
-        if args[0] not in ["BaseModel"]:
+        class_name = args[0]
+        if class_name not in storage.classes():
             print("** class doesn't exist **")
             return
         if len(args) == 1:
             print("** instance id missing **")
             return
         obj_dict = storage.all()
-        key = args[0] + "." + args[1]
+        key = class_name + "." + args[1]
         if key in obj_dict:
             del obj_dict[key]
             storage.save()
