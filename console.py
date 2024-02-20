@@ -6,10 +6,7 @@ from models.base_model import BaseModel
 from models import storage
 import re
 import json
-<<<<<<< HEAD
 
-=======
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
 
 class HBNBCommand(cmd.Cmd):
 
@@ -17,83 +14,13 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = "(hbnb) "
 
-<<<<<<< HEAD
-    def default(self, line):
-        """Catch commands if nothing else matches then."""
-        # print("DEF:::", line)
-        self._precmd(line)
-
-    def _precmd(self, line):
-        """Intercepts commands to test for class.syntax()"""
-        # print("PRECMD:::", line)
-        match = re.search(r"^(\w*)\.(\w+)(?:\(([^)]*)\))$", line)
-        if not match:
-            return line
-        classname = match.group(1)
-        method = match.group(2)
-        args = match.group(3)
-        match_uid_and_args = re.search('^"([^"]*)"(?:, (.*))?$', args)
-        if match_uid_and_args:
-            uid = match_uid_and_args.group(1)
-            attr_or_dict = match_uid_and_args.group(2)
-        else:
-            uid = args
-            attr_or_dict = False
-
-        attr_and_value = ""
-        if method == "update" and attr_or_dict:
-            match_dict = re.search('^({.*})$', attr_or_dict)
-            if match_dict:
-                self.update_dict(classname, uid, match_dict.group(1))
-                return ""
-            match_attr_and_value = re.search(
-                '^(?:"([^"]*)")?(?:, (.*))?$', attr_or_dict)
-            if match_attr_and_value:
-                attr_and_value = (match_attr_and_value.group(
-                    1) or "") + " " + (match_attr_and_value.group(2) or "")
-        command = method + " " + classname + " " + uid + " " + attr_and_value
-        self.onecmd(command)
-        return command
-
-    def update_dict(self, classname, uid, s_dict):
-        """Helper method for update() with a dictionary."""
-        s = s_dict.replace("'", '"')
-        d = json.loads(s)
-        if not classname:
-            print("** class name missing **")
-        elif classname not in storage.classes():
-            print("** class doesn't exist **")
-        elif uid is None:
-            print("** instance id missing **")
-        else:
-            key = "{}.{}".format(classname, uid)
-            if key not in storage.all():
-                print("** no instance found **")
-            else:
-                attributes = storage.attributes()[classname]
-                for attribute, value in d.items():
-                    if attribute in attributes:
-                        value = attributes[attribute](value)
-                    setattr(storage.all()[key], attribute, value)
-                storage.all()[key].save()
-
-    def do_EOF(self, line):
-        """Exit the program at EOF..
-        """
-=======
     def do_quit(self, line):
         """Quit command to exit the program."""
         return True
 
     def do_EOF(self, line):
         """Exit the program at EOF."""
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
         print()
-        return True
-
-    def do_quit(self, line):
-        """Quit command to exit the program.
-        """
         return True
 
     def emptyline(self):
@@ -102,12 +29,7 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, line):
-<<<<<<< HEAD
-        """Create a new instance of BaseModel.
-        """
-=======
-        """Creates an instance."""
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
+        """Create a new instance of BaseModel."""
         if line == "" or line is None:
             print("** class name missing **")
         elif line not in storage.classes():
@@ -118,12 +40,8 @@ class HBNBCommand(cmd.Cmd):
             print(b.id)
 
     def do_show(self, line):
-<<<<<<< HEAD
         """Prints the string representation of an instance.
         """
-=======
-        """Prints the string representation of an instance."""
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
         if line == "" or line is None:
             print("** class name missing **")
         else:
@@ -140,12 +58,8 @@ class HBNBCommand(cmd.Cmd):
                     print(storage.all()[key])
 
     def do_destroy(self, line):
-<<<<<<< HEAD
         """Deletes an instance based on the class name and id.
         """
-=======
-        """Deletes an instance based on the class name and id."""
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
         if line == "" or line is None:
             print("** class name missing **")
         else:
@@ -161,7 +75,6 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     del storage.all()[key]
                     storage.save()
-<<<<<<< HEAD
 
     def do_all(self, line):
         """Prints all string representation of all instances.
@@ -181,10 +94,6 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, line):
         """Counts the instances of a class.
         """
-=======
-
-    def do_all(self, line):
-        """Prints all string representation of all instances."""
         if line != "":
             words = line.split(' ')
             if words[0] not in storage.classes():
@@ -199,7 +108,6 @@ class HBNBCommand(cmd.Cmd):
 
     def do_count(self, line):
         """Counts the instances of a class."""
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
         words = line.split(' ')
         if not words[0]:
             print("** class name missing **")
@@ -212,12 +120,7 @@ class HBNBCommand(cmd.Cmd):
             print(len(matches))
 
     def do_update(self, line):
-<<<<<<< HEAD
-        """Updates an instance by adding or updating attribute.
-        """
-=======
         """Updates an instance based on the class name and id."""
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
         if line == "" or line is None:
             print("** class name missing **")
             return
@@ -261,8 +164,6 @@ class HBNBCommand(cmd.Cmd):
                         pass  # fine, stay a string then
                 setattr(storage.all()[key], attribute, value)
                 storage.all()[key].save()
-<<<<<<< HEAD
-=======
 
     def default(self, line):
         """Catch commands if nothing else matches then."""
@@ -322,7 +223,6 @@ class HBNBCommand(cmd.Cmd):
                         value = attributes[attribute](value)
                     setattr(storage.all()[key], attribute, value)
                 storage.all()[key].save()
->>>>>>> 62f520a7634a3d26aa0ba017548fb6772583c022
 
 
 if __name__ == '__main__':

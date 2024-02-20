@@ -1,9 +1,17 @@
 body{
+<<<<<<< HEAD
 	margin: 0;
     padding: 0;
     color: #484848;
     font-size: 14px;
   font-family: Circular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+=======
+    margin: 0;
+    padding: 0;
+    color: #484848;
+    font-size: 14px;
+    font-family: Circular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+>>>>>>> a57823c8d64576660af10fbb244936f53ccfc4cf
  }
 
 .container{
