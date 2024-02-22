@@ -7,11 +7,7 @@
     text-align: right;
 }
 
-<<<<<<< HEAD
 section.filters button{
-=======
-.filters button{
->>>>>>> a57823c8d64576660af10fbb244936f53ccfc4cf
     margin-top: 11px;
     margin-bottom: 11px;
     margin-right: 30px;
@@ -23,11 +19,7 @@ section.filters button{
     border: none;
     border-radius: 4px;
 }
-<<<<<<< HEAD
 section.filters button:hover {
-=======
-.filters button:hover {
->>>>>>> a57823c8d64576660af10fbb244936f53ccfc4cf
     opacity: 0.9;
 }
 .locations{

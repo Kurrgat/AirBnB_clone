@@ -7,19 +7,9 @@ header {
     align-items: center;
 }
 
-<<<<<<< HEAD
 header .logo {
     width: 142px;
     height: 60px;
     background: url("../images/logo.png") no-repeat center;
     padding-left: 20px;
-=======
-.logo {
-    background-image: url("../images/logo.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    height: 30px;
-    width: auto;
-    margin-left: 20px;
->>>>>>> a57823c8d64576660af10fbb244936f53ccfc4cf
 }
